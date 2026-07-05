@@ -3,6 +3,7 @@ let s:line_start = '\v^\s*'
 let s:symbol_chars = "0-9a-zA-Z-*+!_'?<>="
 let s:word = '['.s:symbol_chars.']+'
 let s:ns_word = '['.s:symbol_chars.'.]+' " Namespaces can also have dots
+let s:meta_word = '['.s:symbol_chars.': ]+' " Metadata can have : and spaces
 
 " We want to support both referred and qualified references to a test
 " definition function, i.e. both of these should work:
@@ -12,9 +13,10 @@ let s:ns_word = '['.s:symbol_chars.'.]+' " Namespaces can also have dots
 "
 function! s:patterns(name)
 	let l:prefix = s:line_start.'\(\s*'
+  let l:metadata = '%(\s+\^\{'.s:meta_word.'\})?'
 	let l:suffix = '\s+('.s:word.')'
 	let l:qualified_name = s:ns_word.'\/'.a:name
-	return [l:prefix.a:name.l:suffix, l:prefix.l:qualified_name.l:suffix]
+	return [l:prefix.a:name.l:metadata.l:suffix, l:prefix.l:qualified_name.l:metadata.l:suffix]
 endfunction
 
 let test#clojure#patterns = {
